@@ -1,0 +1,18 @@
+/* style.css */
+
+/* This is a simple fade-in and slide-up animation for our result card */
+@keyframes fadeIn {
+              from {
+                            opacity: 0;
+                            transform: translateY(15px);
+              }
+
+              to {
+                            opacity: 1;
+                            transform: translateY(0);
+              }
+}
+
+.animate-fade-in {
+              animation: fadeIn 0.5s ease-out forwards;
+}
