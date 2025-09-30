@@ -1,22 +1,18 @@
-// api/explain.js (The Final Version with CORS Headers)
+// api/explain.js (The Final, Victorious Version)
 
 module.exports = async (req, res) => {
-  // --- THE CORS FIX ---
-  // These three lines are our "permission slip."
-  // They tell the browser that any website ('*') is allowed to talk to our API.
+  // Our "permission slip" for the browser
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
   );
-  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
 
-  // We handle a special "preflight" request that browsers send for CORS checks.
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // The rest of our beautiful code is exactly the same.
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
@@ -37,7 +33,15 @@ module.exports = async (req, res) => {
       },
       body: JSON.stringify({
         model: "gpt-4o",
-        messages: [{ role: "user", content: prompt }],
+        messages: [
+          // --- THE FINAL FIX IS HERE ---
+          // This system message explicitly tells the AI its output format, satisfying the rule.
+          {
+            role: "system",
+            content: "You are a helpful assistant designed to output JSON.",
+          },
+          { role: "user", content: prompt },
+        ],
         response_format: { type: "json_object" },
       }),
     });
