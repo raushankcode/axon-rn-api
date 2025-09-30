@@ -1,11 +1,10 @@
-// script.js
+// script.js (The Final, Victorious Version)
 
 // --- 1. DEFINE THE API URL ---
 // CRUCIAL: Replace this with your actual live Vercel API URL.
 const API_URL = "https://axon-rn-api.vercel.app/api/explain";
 
 // --- 2. GET REFERENCES TO OUR HTML ELEMENTS ---
-// We get our "tools" from the HTML so we can work with them.
 const explainForm = document.getElementById("explain-form");
 const conceptInput = document.getElementById("concept-input");
 const explainButton = document.getElementById("explain-button");
@@ -18,8 +17,7 @@ const handleExplain = async (event) => {
 
   const concept = conceptInput.value.trim();
   if (!concept) {
-    // Don't do anything if the input is empty
-    return;
+    return; // Don't do anything if the input is empty
   }
 
   // --- Start the Loading State ---
@@ -62,14 +60,25 @@ const handleExplain = async (event) => {
 
 // --- 4. HELPER FUNCTIONS TO RENDER THE UI ---
 
-// This function builds the "Aha!" moment card
+// THIS IS THE UPGRADED, ROBUST FUNCTION
 const renderSuccess = (data) => {
+  // Safety check: If explanationBullets exists and is an array, we build the list.
+  // If not, we provide a safe fallback message.
+  const storyListHtml =
+    data.explanationBullets && Array.isArray(data.explanationBullets)
+      ? data.explanationBullets.map((bullet) => `<li>${bullet}</li>`).join("")
+      : "<li>The AI did not provide a step-by-step story for this topic.</li>";
+
   // We build the final HTML for the explanation card as a string.
   const successHtml = `
         <div class="bg-white p-6 rounded-lg shadow-md animate-fade-in">
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">${data.title}</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">${
+              data.title || "Untitled"
+            }</h2>
             <p class="italic text-gray-600 mb-4">
-                <strong>Analogy:</strong> ${data.analogy}
+                <strong>Analogy:</strong> ${
+                  data.analogy || "No analogy provided."
+                }
             </p>
             <div class="grid md:grid-cols-2 gap-6">
                 <div>
@@ -77,21 +86,22 @@ const renderSuccess = (data) => {
                         The Story
                     </h3>
                     <ol class="list-decimal pl-5 space-y-2 text-gray-700">
-                        ${data.explanationBullets
-                          .map((bullet) => `<li>${bullet}</li>`)
-                          .join("")}
+                        ${storyListHtml}
                     </ol>
                 </div>
                 <div>
                     <h3 class="text-lg font-semibold text-gray-700 mb-2 border-b pb-1">
                         The Visual Map
                     </h3>
-                    ${data.diagramHtml}
+                    ${
+                      data.diagramHtml ||
+                      '<div class="p-4 border rounded-lg bg-gray-50"><p>No diagram was provided for this topic.</p></div>'
+                    }
                 </div>
             </div>
         </div>
     `;
-  // We inject this beautiful HTML into our output section.
+  // We inject this beautiful and safe HTML into our output section.
   outputSection.innerHTML = successHtml;
 };
 
