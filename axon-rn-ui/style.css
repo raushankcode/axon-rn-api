@@ -16,3 +16,18 @@
 .animate-fade-in {
               animation: fadeIn 0.5s ease-out forwards;
 }
+
+/* Add these to style.css */
+.is-highlighted {
+              border-color: #3b82f6;
+              /* A beautiful blue */
+              box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+              transform: scale(1.02);
+              transition: all 0.2s ease-in-out;
+}
+
+.is-clinical-pearl {
+              background-color: #fef9c3;
+              /* A soft gold */
+              border-color: #facc15;
+}

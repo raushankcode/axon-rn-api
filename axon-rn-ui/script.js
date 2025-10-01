@@ -1,26 +1,44 @@
-// script.js (The Final, Victorious Version)
+// script.js (The Definitive "Magic Loop" Version)
 
-// --- 1. DEFINE THE API URL ---
-// CRUCIAL: Replace this with your actual live Vercel API URL.
+// --- 1. CONSTANTS & ELEMENTS ---
 const API_URL = "https://axon-rn-api.vercel.app/api/explain";
-
-// --- 2. GET REFERENCES TO OUR HTML ELEMENTS ---
 const explainForm = document.getElementById("explain-form");
 const conceptInput = document.getElementById("concept-input");
 const explainButton = document.getElementById("explain-button");
 const outputSection = document.getElementById("output-section");
+const welcomeModal = document.getElementById("welcome-modal");
+const nameForm = document.getElementById("name-form");
+const nameInput = document.getElementById("name-input");
+const welcomeMessageSpan = document.getElementById("welcome-message");
 
-// --- 3. THE MAIN FUNCTION: HANDLE THE EXPLANATION ---
-const handleExplain = async (event) => {
-  // Prevent the form from reloading the page
-  event.preventDefault();
+let currentExplanationData = null; // A global variable to hold our precious data
 
-  const concept = conceptInput.value.trim();
-  if (!concept) {
-    return; // Don't do anything if the input is empty
+// --- 2. PERSONAL TUTOR LOGIC ---
+const checkUser = () => {
+  const userName = localStorage.getItem("axonUserName");
+  if (!userName) {
+    welcomeModal.classList.remove("hidden");
+  } else {
+    welcomeMessageSpan.textContent = `Welcome back, ${userName}. Let's make nursing school simple today!`;
   }
+};
 
-  // --- Start the Loading State ---
+const saveUserName = (event) => {
+  event.preventDefault();
+  const userName = nameInput.value.trim();
+  if (userName) {
+    localStorage.setItem("axonUserName", userName);
+    welcomeModal.classList.add("hidden");
+    welcomeMessageSpan.textContent = `Welcome, ${userName}! Let's get started.`;
+  }
+};
+
+// --- 3. MAIN EXPLANATION LOGIC ---
+const handleExplain = async (event) => {
+  event.preventDefault();
+  const concept = conceptInput.value.trim();
+  if (!concept) return;
+
   explainButton.disabled = true;
   explainButton.textContent = "Thinking...";
   outputSection.innerHTML = `
@@ -31,91 +49,123 @@ const handleExplain = async (event) => {
         </div>
     `;
 
-  // --- Call Our Brain (The API) ---
   try {
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ concept: concept }),
+      body: JSON.stringify({ concept }),
     });
-
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message || "Something went wrong on the server."
-      );
+      const e = await response.json();
+      throw new Error(e.message || "An error occurred.");
     }
 
-    const data = await response.json();
-    renderSuccess(data);
+    currentExplanationData = await response.json();
+
+    // --- MAGIC LOOP STEP 1: PRIME ---
+    // Instead of rendering success, we now show the mission modal.
+    showMissionModal(currentExplanationData.missionQuestion);
   } catch (error) {
-    console.error("Error fetching explanation:", error);
     renderError(error.message);
   } finally {
-    // --- End the Loading State ---
     explainButton.disabled = false;
     explainButton.textContent = "Explain";
   }
 };
 
-// --- 4. HELPER FUNCTIONS TO RENDER THE UI ---
+// --- 4. MAGIC LOOP UI FUNCTIONS ---
+const showMissionModal = (question) => {
+  const modalHtml = `
+        <div id="mission-backdrop" class="fixed inset-0 bg-black bg-opacity-60 z-20 flex justify-center items-center p-4 animate-fade-in">
+            <div class="bg-white rounded-lg shadow-2xl p-8 max-w-lg w-full text-center">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">🚀 Your One-Minute Mission</h2>
+                <p class="text-gray-600 mb-6">Find the answer to this one key question in the visual map:</p>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md mb-8">
+                    <p class="text-blue-800 font-semibold text-lg">${
+                      question || "Identify the most critical step."
+                    }</p>
+                </div>
+                <button id="start-mission-btn" class="bg-blue-600 text-white font-bold px-8 py-3 rounded-lg hover:bg-blue-700">Start Mission</button>
+            </div>
+        </div>
+    `;
+  // We add the modal to the end of the body, not in the output section.
+  document.body.insertAdjacentHTML("beforeend", modalHtml);
+  document
+    .getElementById("start-mission-btn")
+    .addEventListener("click", startMission);
+};
 
-// THIS IS THE UPGRADED, ROBUST FUNCTION
+const startMission = () => {
+  document.getElementById("mission-backdrop")?.remove();
+  // --- MAGIC LOOP STEP 2: INSIGHT ---
+  // Now we render the full explanation.
+  renderSuccess(currentExplanationData);
+};
+
+// --- 5. UI RENDERING LOGIC ---
 const renderSuccess = (data) => {
-  // Safety check: If explanationBullets exists and is an array, we build the list.
-  // If not, we provide a safe fallback message.
   const storyListHtml =
     data.explanationBullets && Array.isArray(data.explanationBullets)
       ? data.explanationBullets.map((bullet) => `<li>${bullet}</li>`).join("")
-      : "<li>The AI did not provide a step-by-step story for this topic.</li>";
+      : "<li>The story for this topic will appear here.</li>";
 
-  // We build the final HTML for the explanation card as a string.
   const successHtml = `
         <div class="bg-white p-6 rounded-lg shadow-md animate-fade-in">
             <h2 class="text-2xl font-bold text-gray-800 mb-2">${
               data.title || "Untitled"
             }</h2>
-            <p class="italic text-gray-600 mb-4">
-                <strong>Analogy:</strong> ${
-                  data.analogy || "No analogy provided."
-                }
-            </p>
+            <p class="italic text-gray-600 mb-4"><strong>Analogy:</strong> ${
+              data.analogy || "No analogy provided."
+            }</p>
             <div class="grid md:grid-cols-2 gap-6">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-700 mb-2 border-b pb-1">
-                        The Story
-                    </h3>
-                    <ol class="list-decimal pl-5 space-y-2 text-gray-700">
-                        ${storyListHtml}
-                    </ol>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2 border-b pb-1">The Story</h3>
+                    <ol class="list-decimal pl-5 space-y-2 text-gray-700">${storyListHtml}</ol>
                 </div>
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-700 mb-2 border-b pb-1">
-                        The Visual Map
-                    </h3>
-                    ${
-                      data.diagramHtml ||
-                      '<div class="p-4 border rounded-lg bg-gray-50"><p>No diagram was provided for this topic.</p></div>'
-                    }
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2 border-b pb-1">The Visual Map</h3>
+                    <div class="p-4 bg-gray-50 rounded-lg border">${
+                      data.diagramHtml || "<p>No diagram provided.</p>"
+                    }</div>
                 </div>
             </div>
+            ${createFeedbackHtml()}
+            ${createReportIssueHtml()}
         </div>
     `;
-  // We inject this beautiful and safe HTML into our output section.
   outputSection.innerHTML = successHtml;
+
+  document
+    .getElementById("feedback-yes")
+    ?.addEventListener("click", handleFeedbackClick);
+  document
+    .getElementById("feedback-no")
+    ?.addEventListener("click", handleFeedbackClick);
 };
 
-// This function builds the error message card
 const renderError = (message) => {
-  const errorHtml = `
+  outputSection.innerHTML = `
         <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md animate-fade-in" role="alert">
             <p class="font-bold">An Error Occurred</p>
             <p>${message}</p>
         </div>
     `;
-  outputSection.innerHTML = errorHtml;
 };
 
-// --- 5. ATTACH THE EVENT LISTENER ---
-// We tell the form to run our 'handleExplain' function when it is submitted.
+// --- 6. "KINDNESS & TRUST LAYER" LOGIC ---
+const createFeedbackHtml = () => {
+  /* ... unchanged ... */
+};
+const handleFeedbackClick = () => {
+  /* ... unchanged ... */
+};
+const createReportIssueHtml = () => {
+  /* ... unchanged ... */
+};
+
+// --- 7. INITIALIZE THE APPLICATION ---
+document.addEventListener("DOMContentLoaded", checkUser);
+nameForm.addEventListener("submit", saveUserName);
 explainForm.addEventListener("submit", handleExplain);
+``;
