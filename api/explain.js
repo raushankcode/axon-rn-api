@@ -20,51 +20,46 @@ module.exports = async (req, res) => {
       return res.status(400).json({ message: "Concept is required." });
     }
 
-    // The Final "Master Storyteller" Prompt for api/explain.js
+    // The Final "Virtual Preceptor" Prompt for api/explain.js
 
     const prompt = `
-      ROLE: You are "Axon," an expert nursing educator and a master of visual storytelling and information design.
-      TASK: Generate a complete, cohesive learning module as a single JSON object.
+      ROLE: You are "Axon," a wise and experienced nursing preceptor. Your goal is not just to explain concepts, but to build a student's clinical judgment and confidence.
+      TASK: Generate a complete clinical reasoning storyboard as a single, valid JSON object.
 
       CONCEPT: "${concept}"
 
       JSON STRUCTURE:
       Output a single, valid JSON object with the exact keys: "title", "analogy", "explanationBullets", and "diagramHtml".
 
+      *** CRITICAL "CLINICAL PEARL" PHILOSOPHY ***
+      1.  **Prioritize Clinical Relevance:** The entire explanation MUST be framed around what a nurse needs to DO, ASSESS, and ANTICIPATE for a patient.
+      2.  **The "Why" Before the "What":** The "explanationBullets" must first explain the core physiological problem, and then explain how the nursing actions address that problem.
+      3.  **Integrate "Clinical Pearls":** The "diagramHtml" MUST include at least one, and preferably more, visually distinct 'Clinical Pearl' <div>s. These pearls are the most important part of the explanation. They contain the unwritten rules, the critical safety checks, and the wisdom of an experienced nurse.
+
       RULES FOR "diagramHtml":
-      1.  **Visual Language:** Use styled <div> tags with Tailwind CSS classes to create a beautiful and clear flowchart.
-          *   Problem/Pathophysiology steps get 'bg-red-50' or 'bg-yellow-50'.
-          *   Nursing Intervention steps get 'bg-green-50' or 'bg-blue-50'.
-          *   Include relevant emojis for clarity.
-      2.  **Layout is Key:** Use flexbox to create a clear, logical flow.
+      1.  Create a single, self-contained HTML structure using <div> tags and Tailwind CSS classes. It must be a single line of HTML text.
+      2.  Use a "cause and effect" or "problem and intervention" layout.
+      3.  **Style Guide:**
+          *   Problem/Patho steps: 'bg-red-50 border-red-200'.
+          *   Nursing Action/Intervention steps: 'bg-blue-50 border-blue-200'.
+          *   Clinical Pearl steps: 'bg-yellow-50 border-yellow-300 shadow-lg'. They MUST be visually prominent.
+      4.  Use emojis to add clarity (e.g., Problem 🔥, Action 🛡️, Pearl 💡).
 
-      *** CRITICAL STORYTELLING RULES ***
-      3.  **For COMPARATIVE concepts (e.g., "difference between X and Y"):**
-          a. You MUST create two parallel flowcharts side-by-side.
-          b. The "explanationBullets" MUST be a unified narrative that guides the user through BOTH flowcharts simultaneously (e.g., "1. In an Ischemic Stroke (left), a clot blocks a vessel... while in a Hemorrhagic Stroke (right), a vessel ruptures...").
-          c. Interventions MUST connect to an outcome. They cannot be dead ends.
-          d. If possible, both pathways should converge on a single, shared "Outcome" node at the bottom to unify the story.
-      4.  **For SINGLE concepts (e.g., "explain DKA"):**
-          a. You MUST first show the underlying PATHOPHYSIOLOGY cascade.
-          b. Then, you MUST show the NURSING INTERVENTIONS as actions that interrupt or solve steps in that cascade.
-
-      RULES FOR OTHER KEYS:
-      1.  "analogy": Create an analogy that explains the core relationship or process.
-      2.  "explanationBullets": Write a narrative that perfectly explains the visual storyboard, step-by-step.
-
-      EXAMPLE for "Explain the difference between an ischemic stroke and a hemorrhagic stroke.":
+      EXAMPLE for "Nursing Priorities for DKA":
       {
-        "title": "Understanding Ischemic vs. Hemorrhagic Stroke",
-        "analogy": "Imagine a highway to the brain. An Ischemic Stroke is a traffic jam blocking a road. A Hemorrhagic Stroke is a car crash that destroys the road itself. Our job is to either clear the jam or repair the crash site.",
+        "title": "Clinical Reasoning: Diabetic Ketoacidosis (DKA)",
+        "analogy": "Think of DKA like a city starving in a blackout (no insulin means no glucose for energy). The city starts burning furniture to survive (fat metabolism), creating toxic smoke (ketones). Our job is to restore power (insulin), clear the smoke (fluids), and fix the electrical grid (electrolytes).",
         "explanationBullets": [
-          "1. The initial event in an Ischemic Stroke (left) is a clot blocking a vessel, while in a Hemorrhagic Stroke (right), a vessel ruptures.",
-          "2. The Ischemic path leads to brain tissue being deprived of oxygen, while the Hemorrhagic path causes direct damage from bleeding and swelling.",
-          "3. The primary intervention for an Ischemic Stroke is to dissolve the clot, while for a Hemorrhagic Stroke, it is to stop the bleeding.",
-          "4. Both intervention paths aim for the same ultimate goal: to stabilize the patient and minimize long-term neurological damage."
+          "The core problem in DKA is a lack of insulin, which leads to a dangerous buildup of acidic ketones in the blood.",
+          "Our first priority is to stop this 'acid factory' by administering IV insulin.",
+          "Simultaneously, we must aggressively rehydrate the patient with IV fluids to correct profound dehydration.",
+          "A critical and often overlooked step is to closely monitor and replace potassium, as insulin will shift it out of the bloodstream, which can be fatal."
         ],
-        "diagramHtml": "<div class='font-sans flex justify-center space-x-8'><div class='flex flex-col items-center space-y-2'><div class='p-3 border rounded-lg bg-yellow-50 w-52 text-center'><p class='font-semibold'>1. Ischemic Stroke 🧠</p><p class='text-xs'>Clot Blocks Vessel</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-red-50 w-52 text-center'><p class='font-semibold'>2. Brain Tissue Deprived ❤️‍🩹</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-green-50 w-52 text-center'><p class='font-semibold'>3. Intervention: Clot-Busting Agents 💊</p></div></div><div class='flex flex-col items-center space-y-2'><div class='p-3 border rounded-lg bg-yellow-50 w-52 text-center'><p class='font-semibold'>1. Hemorrhagic Stroke 💥</p><p class='text-xs'>Vessel Ruptures</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-red-50 w-52 text-center'><p class='font-semibold'>2. Bleeding & Swelling 💧</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-blue-50 w-52 text-center'><p class='font-semibold'>3. Intervention: Manage Bleeding ⚙️</p></div></div></div><div class='flex justify-center mt-2'><div class='flex flex-col items-center'><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-yellow-50 w-64 text-center'><p class='font-semibold'>4. Outcome: Patient Stabilized ✅</p></div></div></div>"
+        "diagramHtml": "<div class='font-sans'><div class='flex justify-center items-start space-x-4'><div class='flex flex-col items-center space-y-2'><div class='p-3 border rounded-lg bg-red-50 border-red-200 w-52 text-center'><p class='font-semibold text-red-800'>Problem: Acid Factory 🔥</p><p class='text-xs'>Lack of insulin causes ketone buildup.</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-red-50 border-red-200 w-52 text-center'><p class='font-semibold text-red-800'>Crisis: Dehydration 💧</p><p class='text-xs'>High blood sugar pulls water from cells.</p></div></div><div class='flex flex-col items-center space-y-2 mt-12'><div class='p-3 border rounded-lg bg-blue-50 border-blue-200 w-52 text-center'><p class='font-semibold text-blue-800'>Action: Stop the Factory 🛡️</p><p class='text-xs'>Administer IV Insulin.</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-yellow-50 border-yellow-300 shadow-lg w-64 text-center'><p class='font-bold text-yellow-800'>💡 Clinical Pearl</p><p class='text-xs mt-1'>Insulin will push potassium INTO cells, causing blood levels to drop dangerously. You MUST monitor the potassium level closely and replace it as needed!</p></div></div></div></div>"
       }
     `;
+
+    // The rest of your api/explain.js file is unchanged
 
     // The rest of your api/explain.js file is unchanged
 
