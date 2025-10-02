@@ -1,4 +1,4 @@
-/* style.css */
+/* style.css (The Final, Polished Version) */
 
 /* This is a simple fade-in and slide-up animation for our result card */
 @keyframes fadeIn {
@@ -17,17 +17,18 @@
               animation: fadeIn 0.5s ease-out forwards;
 }
 
-/* Add these to style.css */
+/* This is the "Aha!" highlight for the Magic Loop */
 .is-highlighted {
-              border-color: #3b82f6;
+              border-color: #3b82f6 !important;
               /* A beautiful blue */
               box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
               transform: scale(1.02);
               transition: all 0.2s ease-in-out;
 }
 
+/* This is the style for our "Clinical Pearl" wisdom */
 .is-clinical-pearl {
-              background-color: #fef9c3;
+              background-color: #fef9c3 !important;
               /* A soft gold */
-              border-color: #facc15;
+              border-color: #facc15 !important;
 }

@@ -1,7 +1,9 @@
-// script.js (The Definitive "Magic Loop" Version)
+// script.js (The Final, Complete, "Magic Loop" Version)
 
-// --- 1. CONSTANTS & ELEMENTS ---
-const API_URL = "https://axon-rn-api.vercel.app/api/explain";
+// --- 1. DEFINE OUR GLOBAL CONSTANTS ---
+const API_URL = "https://axon-rn-api.vercel.app/api/explain"; // Ensure this is your correct, live Vercel API URL
+
+// --- 2. GET REFERENCES TO ALL HTML ELEMENTS ---
 const explainForm = document.getElementById("explain-form");
 const conceptInput = document.getElementById("concept-input");
 const explainButton = document.getElementById("explain-button");
@@ -10,10 +12,12 @@ const welcomeModal = document.getElementById("welcome-modal");
 const nameForm = document.getElementById("name-form");
 const nameInput = document.getElementById("name-input");
 const welcomeMessageSpan = document.getElementById("welcome-message");
+const missionBackdrop = document.getElementById("mission-modal-backdrop");
+const missionContent = document.getElementById("mission-modal-content");
 
-let currentExplanationData = null; // A global variable to hold our precious data
+let currentExplanationData = null; // A global variable to hold our data between steps
 
-// --- 2. PERSONAL TUTOR LOGIC ---
+// --- 3. PERSONAL TUTOR LOGIC ---
 const checkUser = () => {
   const userName = localStorage.getItem("axonUserName");
   if (!userName) {
@@ -33,7 +37,7 @@ const saveUserName = (event) => {
   }
 };
 
-// --- 3. MAIN EXPLANATION LOGIC ---
+// --- 4. MAIN EXPLANATION LOGIC (THE START OF THE LOOP) ---
 const handleExplain = async (event) => {
   event.preventDefault();
   const concept = conceptInput.value.trim();
@@ -42,12 +46,12 @@ const handleExplain = async (event) => {
   explainButton.disabled = true;
   explainButton.textContent = "Thinking...";
   outputSection.innerHTML = `
-        <div class="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-md animate-fade-in">
-            <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-            <h3 class="mt-4 text-lg font-semibold text-gray-700">Forging Your Clarity Card...</h3>
-            <p class="mt-1 text-sm text-gray-500">This can take a moment. Our AI is doing some deep thinking!</p>
-        </div>
-    `;
+    <div class="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-md animate-fade-in">
+        <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <h3 class="mt-4 text-lg font-semibold text-gray-700">Forging Your Clarity Card...</h3>
+        <p class="mt-1 text-sm text-gray-500">This can take a moment. Our AI is doing some deep thinking!</p>
+    </div>
+  `;
 
   try {
     const response = await fetch(API_URL, {
@@ -57,53 +61,47 @@ const handleExplain = async (event) => {
     });
     if (!response.ok) {
       const e = await response.json();
-      throw new Error(e.message || "An error occurred.");
+      throw new Error(
+        e.message || "The AI is having a tough time. Please try again."
+      );
     }
 
     currentExplanationData = await response.json();
 
-    // --- MAGIC LOOP STEP 1: PRIME ---
-    // Instead of rendering success, we now show the mission modal.
+    // MAGIC LOOP STEP 1: PRIME
     showMissionModal(currentExplanationData.missionQuestion);
   } catch (error) {
     renderError(error.message);
-  } finally {
     explainButton.disabled = false;
     explainButton.textContent = "Explain";
   }
 };
 
-// --- 4. MAGIC LOOP UI FUNCTIONS ---
+// --- 5. MAGIC LOOP UI FUNCTIONS ---
 const showMissionModal = (question) => {
-  const modalHtml = `
-        <div id="mission-backdrop" class="fixed inset-0 bg-black bg-opacity-60 z-20 flex justify-center items-center p-4 animate-fade-in">
-            <div class="bg-white rounded-lg shadow-2xl p-8 max-w-lg w-full text-center">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">🚀 Your One-Minute Mission</h2>
-                <p class="text-gray-600 mb-6">Find the answer to this one key question in the visual map:</p>
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md mb-8">
-                    <p class="text-blue-800 font-semibold text-lg">${
-                      question || "Identify the most critical step."
-                    }</p>
-                </div>
-                <button id="start-mission-btn" class="bg-blue-600 text-white font-bold px-8 py-3 rounded-lg hover:bg-blue-700">Start Mission</button>
-            </div>
+  missionContent.innerHTML = `
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">🚀 Your One-Minute Mission</h2>
+        <p class="text-gray-600 mb-6">Find the answer to this one key question in the visual map:</p>
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md mb-8">
+            <p class="text-blue-800 font-semibold text-lg">${
+              question || "Find the most important step."
+            }</p>
         </div>
+        <button id="start-mission-btn" class="bg-blue-600 text-white font-bold px-8 py-3 rounded-lg hover:bg-blue-700">Start Mission</button>
     `;
-  // We add the modal to the end of the body, not in the output section.
-  document.body.insertAdjacentHTML("beforeend", modalHtml);
+  missionBackdrop.classList.remove("hidden");
   document
     .getElementById("start-mission-btn")
     .addEventListener("click", startMission);
 };
 
 const startMission = () => {
-  document.getElementById("mission-backdrop")?.remove();
-  // --- MAGIC LOOP STEP 2: INSIGHT ---
-  // Now we render the full explanation.
+  missionBackdrop.classList.add("hidden");
+  // MAGIC LOOP STEP 2: INSIGHT
   renderSuccess(currentExplanationData);
 };
 
-// --- 5. UI RENDERING LOGIC ---
+// --- 6. UI RENDERING LOGIC ---
 const renderSuccess = (data) => {
   const storyListHtml =
     data.explanationBullets && Array.isArray(data.explanationBullets)
@@ -111,30 +109,33 @@ const renderSuccess = (data) => {
       : "<li>The story for this topic will appear here.</li>";
 
   const successHtml = `
-        <div class="bg-white p-6 rounded-lg shadow-md animate-fade-in">
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">${
-              data.title || "Untitled"
-            }</h2>
-            <p class="italic text-gray-600 mb-4"><strong>Analogy:</strong> ${
-              data.analogy || "No analogy provided."
-            }</p>
-            <div class="grid md:grid-cols-2 gap-6">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-700 mb-2 border-b pb-1">The Story</h3>
-                    <ol class="list-decimal pl-5 space-y-2 text-gray-700">${storyListHtml}</ol>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-700 mb-2 border-b pb-1">The Visual Map</h3>
-                    <div class="p-4 bg-gray-50 rounded-lg border">${
-                      data.diagramHtml || "<p>No diagram provided.</p>"
-                    }</div>
-                </div>
+    <div class="bg-white p-6 rounded-lg shadow-md animate-fade-in">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">${
+          data.title || "Untitled"
+        }</h2>
+        <p class="italic text-gray-600 mb-4"><strong>Analogy:</strong> ${
+          data.analogy || "No analogy provided."
+        }</p>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2 border-b pb-1">The Story</h3>
+                <ol class="list-decimal pl-5 space-y-2 text-gray-700">${storyListHtml}</ol>
             </div>
-            ${createFeedbackHtml()}
-            ${createReportIssueHtml()}
+            <div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2 border-b pb-1">The Visual Map</h3>
+                <div class="p-4 bg-gray-50 rounded-lg border">${
+                  data.diagramHtml || "<p>No diagram provided.</p>"
+                }</div>
+            </div>
         </div>
-    `;
+        ${createFeedbackHtml()}
+        ${createReportIssueHtml()}
+    </div>
+  `;
   outputSection.innerHTML = successHtml;
+
+  explainButton.disabled = false;
+  explainButton.textContent = "Explain";
 
   document
     .getElementById("feedback-yes")
@@ -146,26 +147,21 @@ const renderSuccess = (data) => {
 
 const renderError = (message) => {
   outputSection.innerHTML = `
-        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md animate-fade-in" role="alert">
-            <p class="font-bold">An Error Occurred</p>
-            <p>${message}</p>
-        </div>
-    `;
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md animate-fade-in" role="alert">
+        <p class="font-bold">An Error Occurred</p>
+        <p>${message}</p>
+    </div>
+  `;
 };
 
-// --- 6. "KINDNESS & TRUST LAYER" LOGIC ---
-const createFeedbackHtml = () => {
-  /* ... unchanged ... */
-};
+// --- 7. "KINDNESS & TRUST LAYER" LOGIC ---
+const createFeedbackHtml = () => `... [unchanged] ...`;
 const handleFeedbackClick = () => {
   /* ... unchanged ... */
 };
-const createReportIssueHtml = () => {
-  /* ... unchanged ... */
-};
+const createReportIssueHtml = () => `... [unchanged] ...`;
 
-// --- 7. INITIALIZE THE APPLICATION ---
+// --- 8. INITIALIZE THE APPLICATION ---
 document.addEventListener("DOMContentLoaded", checkUser);
 nameForm.addEventListener("submit", saveUserName);
 explainForm.addEventListener("submit", handleExplain);
-``;

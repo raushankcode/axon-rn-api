@@ -19,33 +19,45 @@ module.exports = async (req, res) => {
     if (!concept) {
       return res.status(400).json({ message: "Concept is required." });
     }
-    // The Final "Magic Loop" & "Clinical Pearl" Prompt
 
-    // The new Mission-Ready Prompt for api/explain.js
+    /// The Final "Clinical Storyteller" Prompt for api/explain.js
 
     const prompt = `
-      You are an expert nursing educator. Your ONLY task is to return a single, valid JSON object. Do not include any text or markdown formatting before or after the JSON.
-      The JSON object must explain the nursing concept: "${concept}".
-      The JSON must have the exact keys: "title", "analogy", "missionQuestion", "explanationBullets", and "diagramHtml".
+      ROLE: You are "Axon," an expert nursing educator and a master of clinical reasoning.
+      TASK: Generate a complete learning module as a single JSON object that tells a "cause and effect" story.
 
-      RULES:
-      1. "missionQuestion": Create one simple, clear question that a student can answer by examining the flowchart. This question MUST target the single most important learning objective.
-      2. "diagramHtml": Create a simple HTML structure using divs and Tailwind CSS classes to represent a flowchart.
-      3. "explanationBullets": A 1:1 narrative legend for the flowchart.
+      CONCEPT: "${concept}"
 
-      EXAMPLE OUTPUT:
+      JSON STRUCTURE:
+      Output a single, valid JSON object with the exact keys: "title", "analogy", "explanationBullets", and "diagramHtml".
+
+      RULES FOR "diagramHtml":
+      1.  **Tell a Story:** The diagram must not be a simple checklist. It must first show the underlying PATHOPHYSIOLOGY (the "problem cascade"). Then, it must show the NURSING INTERVENTIONS as actions that interrupt or solve steps in that cascade.
+      2.  **Use Visual Language:**
+          *   Problem/Pathophysiology steps should have a light red or yellow background (e.g., bg-red-50, bg-yellow-50).
+          *   Nursing Intervention steps should have a light green or blue background (e.g., bg-green-50, bg-blue-50).
+          *   Use emojis to add clarity (e.g., Problem 🔥, Intervention 🛡️).
+      3.  **Layout is Key:** Use flexbox to create a clear, logical flow. Interventions can branch off or point to the problems they solve.
+      4.  The entire output must be a single line of HTML text.
+
+      RULES FOR OTHER KEYS:
+      1.  "analogy": Create an analogy that explains the "cause and effect" relationship.
+      2.  "explanationBullets": Write a narrative that explains the storyboard, step-by-step.
+
+      EXAMPLE for "Nursing Priorities for DKA":
       {
-        "title": "How Beta Blockers Work",
-        "analogy": "They are like soft headphones that partially block adrenaline's signal to the heart.",
-        "missionQuestion": "What specific part of the heart do Beta Blockers block?",
+        "title": "Nursing Priorities for Diabetic Ketoacidosis (DKA)",
+        "analogy": "Imagine a city (the body) that can't use its main fuel (sugar). It starts burning garbage (fat) to survive, but this creates toxic smoke (ketones) that pollutes the entire city. Our job is to restore the main fuel line (insulin) and clean the air (fluids & electrolytes).",
         "explanationBullets": [
-          "Adrenaline binds to beta receptors to speed up the heart.",
-          "Beta Blockers physically block these receptors.",
-          "This results in a slower, calmer heartbeat."
+          "The core problem in DKA is a lack of insulin, which prevents the body from using glucose for energy.",
+          "This forces the body to burn fat, producing acidic ketones as a byproduct.",
+          "High ketones lead to metabolic acidosis, while high glucose leads to severe dehydration.",
+          "Our primary interventions are to administer insulin to stop ketone production and to give IV fluids to rehydrate the patient."
         ],
-        "diagramHtml": "<div class='flex flex-col items-center space-y-2'><div class='p-2 border rounded bg-gray-50'><p>Adrenaline Signal ⚡️</p></div><p>↓</p><div class='p-2 border rounded bg-gray-50'><p>Blocks Beta Receptors 🛡️</p></div><p>↓</p><div class='p-2 border rounded bg-gray-50'><p>Slower Heartbeat ❤️</p></div></div>"
+        "diagramHtml": "<div class='font-sans'><div class='flex justify-center items-start space-x-4'><div class='flex flex-col items-center space-y-2'><div class='p-3 border rounded-lg bg-red-50 shadow-sm w-52 text-center'><p class='font-semibold text-red-800'>1. Lack of Insulin 🚫</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-yellow-50 shadow-sm w-52 text-center'><p class='font-semibold text-yellow-800'>2. Body Burns Fat 🔥</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-yellow-50 shadow-sm w-52 text-center'><p class='font-semibold text-yellow-800'>3. Ketones (Acid) Produced</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-red-50 shadow-sm w-52 text-center'><p class='font-semibold text-red-800'>4. Acidosis & Dehydration</p></div></div><div class='flex flex-col items-center space-y-2 mt-24'><div class='p-3 border rounded-lg bg-green-50 shadow-sm w-52 text-center'><p class='font-semibold text-green-800'>Intervention: Insulin 💉</p></div><p class='text-2xl text-green-500'>→</p><p class='text-2xl text-green-500'>→</p><div class='p-3 border rounded-lg bg-blue-50 shadow-sm w-52 text-center'><p class='font-semibold text-blue-800'>Intervention: IV Fluids 💧</p></div></div></div></div>"
       }
     `;
+    // The rest of your api/explain.js file is unchanged
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
