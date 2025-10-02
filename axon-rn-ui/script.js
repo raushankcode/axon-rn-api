@@ -1,4 +1,4 @@
-// script.js (The Final, Complete, "Magic Loop" Version)
+// script.js (The Final, Definitive, Launch-Ready Version)
 
 // --- 1. DEFINE OUR GLOBAL CONSTANTS ---
 const API_URL = "https://axon-rn-api.vercel.app/api/explain"; // Ensure this is your correct, live Vercel API URL
@@ -155,11 +155,39 @@ const renderError = (message) => {
 };
 
 // --- 7. "KINDNESS & TRUST LAYER" LOGIC ---
-const createFeedbackHtml = () => `... [unchanged] ...`;
-const handleFeedbackClick = () => {
-  /* ... unchanged ... */
+const createFeedbackHtml = () => {
+  return `
+        <div id="feedback-section" class="mt-8 pt-6 border-t border-gray-200 text-center">
+            <h4 class="text-md font-semibold text-gray-700 mb-3">Did this explanation build your confidence?</h4>
+            <div class="flex justify-center gap-3">
+                <button id="feedback-yes" class="px-4 py-2 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors">👍 Yes</button>
+                <button id="feedback-no" class="px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors">👎 Still Confusing</button>
+            </div>
+        </div>
+    `;
 };
-const createReportIssueHtml = () => `... [unchanged] ...`;
+
+const handleFeedbackClick = () => {
+  const feedbackSection = document.getElementById("feedback-section");
+  if (feedbackSection) {
+    feedbackSection.innerHTML = `<p class="text-gray-600 font-semibold animate-fade-in">Thank you for your feedback! 🙏</p>`;
+  }
+};
+
+const createReportIssueHtml = () => {
+  const recipientEmail = "axonrn.dev@gmail.com";
+  const emailSubject = "Axon RN Explanation Issue";
+  const emailBody =
+    "Hello Axon RN Founders,\n\nI found an issue with an explanation. Here are the details:\n\n[Please describe the concept you searched for and what was wrong]\n\nThank you!";
+  const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(
+    emailSubject
+  )}&body=${encodeURIComponent(emailBody)}`;
+  return `
+        <div class="mt-6 text-center">
+            <a href="${mailtoLink}" class="text-xs text-gray-500 hover:text-blue-600 hover:underline">Report an issue with this explanation</a>
+        </div>
+    `;
+};
 
 // --- 8. INITIALIZE THE APPLICATION ---
 document.addEventListener("DOMContentLoaded", checkUser);

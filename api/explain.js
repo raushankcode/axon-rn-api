@@ -20,11 +20,11 @@ module.exports = async (req, res) => {
       return res.status(400).json({ message: "Concept is required." });
     }
 
-    /// The Final "Clinical Storyteller" Prompt for api/explain.js
+    // The Final "Master Storyteller" Prompt for api/explain.js
 
     const prompt = `
-      ROLE: You are "Axon," an expert nursing educator and a master of clinical reasoning.
-      TASK: Generate a complete learning module as a single JSON object that tells a "cause and effect" story.
+      ROLE: You are "Axon," an expert nursing educator and a master of visual storytelling and information design.
+      TASK: Generate a complete, cohesive learning module as a single JSON object.
 
       CONCEPT: "${concept}"
 
@@ -32,31 +32,40 @@ module.exports = async (req, res) => {
       Output a single, valid JSON object with the exact keys: "title", "analogy", "explanationBullets", and "diagramHtml".
 
       RULES FOR "diagramHtml":
-      1.  **Tell a Story:** The diagram must not be a simple checklist. It must first show the underlying PATHOPHYSIOLOGY (the "problem cascade"). Then, it must show the NURSING INTERVENTIONS as actions that interrupt or solve steps in that cascade.
-      2.  **Use Visual Language:**
-          *   Problem/Pathophysiology steps should have a light red or yellow background (e.g., bg-red-50, bg-yellow-50).
-          *   Nursing Intervention steps should have a light green or blue background (e.g., bg-green-50, bg-blue-50).
-          *   Use emojis to add clarity (e.g., Problem 🔥, Intervention 🛡️).
-      3.  **Layout is Key:** Use flexbox to create a clear, logical flow. Interventions can branch off or point to the problems they solve.
-      4.  The entire output must be a single line of HTML text.
+      1.  **Visual Language:** Use styled <div> tags with Tailwind CSS classes to create a beautiful and clear flowchart.
+          *   Problem/Pathophysiology steps get 'bg-red-50' or 'bg-yellow-50'.
+          *   Nursing Intervention steps get 'bg-green-50' or 'bg-blue-50'.
+          *   Include relevant emojis for clarity.
+      2.  **Layout is Key:** Use flexbox to create a clear, logical flow.
+
+      *** CRITICAL STORYTELLING RULES ***
+      3.  **For COMPARATIVE concepts (e.g., "difference between X and Y"):**
+          a. You MUST create two parallel flowcharts side-by-side.
+          b. The "explanationBullets" MUST be a unified narrative that guides the user through BOTH flowcharts simultaneously (e.g., "1. In an Ischemic Stroke (left), a clot blocks a vessel... while in a Hemorrhagic Stroke (right), a vessel ruptures...").
+          c. Interventions MUST connect to an outcome. They cannot be dead ends.
+          d. If possible, both pathways should converge on a single, shared "Outcome" node at the bottom to unify the story.
+      4.  **For SINGLE concepts (e.g., "explain DKA"):**
+          a. You MUST first show the underlying PATHOPHYSIOLOGY cascade.
+          b. Then, you MUST show the NURSING INTERVENTIONS as actions that interrupt or solve steps in that cascade.
 
       RULES FOR OTHER KEYS:
-      1.  "analogy": Create an analogy that explains the "cause and effect" relationship.
-      2.  "explanationBullets": Write a narrative that explains the storyboard, step-by-step.
+      1.  "analogy": Create an analogy that explains the core relationship or process.
+      2.  "explanationBullets": Write a narrative that perfectly explains the visual storyboard, step-by-step.
 
-      EXAMPLE for "Nursing Priorities for DKA":
+      EXAMPLE for "Explain the difference between an ischemic stroke and a hemorrhagic stroke.":
       {
-        "title": "Nursing Priorities for Diabetic Ketoacidosis (DKA)",
-        "analogy": "Imagine a city (the body) that can't use its main fuel (sugar). It starts burning garbage (fat) to survive, but this creates toxic smoke (ketones) that pollutes the entire city. Our job is to restore the main fuel line (insulin) and clean the air (fluids & electrolytes).",
+        "title": "Understanding Ischemic vs. Hemorrhagic Stroke",
+        "analogy": "Imagine a highway to the brain. An Ischemic Stroke is a traffic jam blocking a road. A Hemorrhagic Stroke is a car crash that destroys the road itself. Our job is to either clear the jam or repair the crash site.",
         "explanationBullets": [
-          "The core problem in DKA is a lack of insulin, which prevents the body from using glucose for energy.",
-          "This forces the body to burn fat, producing acidic ketones as a byproduct.",
-          "High ketones lead to metabolic acidosis, while high glucose leads to severe dehydration.",
-          "Our primary interventions are to administer insulin to stop ketone production and to give IV fluids to rehydrate the patient."
+          "1. The initial event in an Ischemic Stroke (left) is a clot blocking a vessel, while in a Hemorrhagic Stroke (right), a vessel ruptures.",
+          "2. The Ischemic path leads to brain tissue being deprived of oxygen, while the Hemorrhagic path causes direct damage from bleeding and swelling.",
+          "3. The primary intervention for an Ischemic Stroke is to dissolve the clot, while for a Hemorrhagic Stroke, it is to stop the bleeding.",
+          "4. Both intervention paths aim for the same ultimate goal: to stabilize the patient and minimize long-term neurological damage."
         ],
-        "diagramHtml": "<div class='font-sans'><div class='flex justify-center items-start space-x-4'><div class='flex flex-col items-center space-y-2'><div class='p-3 border rounded-lg bg-red-50 shadow-sm w-52 text-center'><p class='font-semibold text-red-800'>1. Lack of Insulin 🚫</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-yellow-50 shadow-sm w-52 text-center'><p class='font-semibold text-yellow-800'>2. Body Burns Fat 🔥</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-yellow-50 shadow-sm w-52 text-center'><p class='font-semibold text-yellow-800'>3. Ketones (Acid) Produced</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-red-50 shadow-sm w-52 text-center'><p class='font-semibold text-red-800'>4. Acidosis & Dehydration</p></div></div><div class='flex flex-col items-center space-y-2 mt-24'><div class='p-3 border rounded-lg bg-green-50 shadow-sm w-52 text-center'><p class='font-semibold text-green-800'>Intervention: Insulin 💉</p></div><p class='text-2xl text-green-500'>→</p><p class='text-2xl text-green-500'>→</p><div class='p-3 border rounded-lg bg-blue-50 shadow-sm w-52 text-center'><p class='font-semibold text-blue-800'>Intervention: IV Fluids 💧</p></div></div></div></div>"
+        "diagramHtml": "<div class='font-sans flex justify-center space-x-8'><div class='flex flex-col items-center space-y-2'><div class='p-3 border rounded-lg bg-yellow-50 w-52 text-center'><p class='font-semibold'>1. Ischemic Stroke 🧠</p><p class='text-xs'>Clot Blocks Vessel</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-red-50 w-52 text-center'><p class='font-semibold'>2. Brain Tissue Deprived ❤️‍🩹</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-green-50 w-52 text-center'><p class='font-semibold'>3. Intervention: Clot-Busting Agents 💊</p></div></div><div class='flex flex-col items-center space-y-2'><div class='p-3 border rounded-lg bg-yellow-50 w-52 text-center'><p class='font-semibold'>1. Hemorrhagic Stroke 💥</p><p class='text-xs'>Vessel Ruptures</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-red-50 w-52 text-center'><p class='font-semibold'>2. Bleeding & Swelling 💧</p></div><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-blue-50 w-52 text-center'><p class='font-semibold'>3. Intervention: Manage Bleeding ⚙️</p></div></div></div><div class='flex justify-center mt-2'><div class='flex flex-col items-center'><p class='text-2xl'>↓</p><div class='p-3 border rounded-lg bg-yellow-50 w-64 text-center'><p class='font-semibold'>4. Outcome: Patient Stabilized ✅</p></div></div></div>"
       }
     `;
+
     // The rest of your api/explain.js file is unchanged
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
