@@ -1,81 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Axon RN - Your Companion for Clarity</title>
 
     <!-- Tailwind CSS for beautiful, utility-first styling -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Our custom styles for animations and polish -->
-    <link rel="stylesheet" href="style.css">
-</head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-<body class="bg-gray-50 font-sans antialiased">
-
+  <body class="bg-gray-50 font-sans antialiased">
     <!-- === MODALS (Overlay Components) === -->
 
     <!-- The "Handshake" Welcome Modal: Appears once for new users. -->
-    <div id="welcome-modal" class="fixed inset-0 bg-black bg-opacity-60 z-30 flex justify-center items-center p-4 hidden animate-fade-in">
-        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full text-center">
-            <h2 class="text-2xl font-bold text-gray-800">Welcome to Axon RN!</h2>
-            <p class="text-gray-600 mt-2 mb-6">We're so glad you're here. To make your experience personal, what should we call you?</p>
-            <form id="name-form" class="flex gap-2">
-                <input type="text" id="name-input" placeholder="Enter your first name..." class="flex-grow border-2 border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-                <button type="submit" class="bg-blue-600 text-white font-semibold px-6 py-2 rounded-md hover:bg-blue-700">Let's Go!</button>
-            </form>
-        </div>
+    <div
+      id="welcome-modal"
+      class="fixed inset-0 bg-black bg-opacity-60 z-30 flex justify-center items-center p-4 hidden animate-fade-in">
+      <div
+        class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full text-center">
+        <h2 class="text-2xl font-bold text-gray-800">Welcome to Axon RN!</h2>
+        <p class="text-gray-600 mt-2 mb-6">
+          We're so glad you're here. To make your experience personal, what
+          should we call you?
+        </p>
+        <form id="name-form" class="flex gap-2">
+          <input
+            type="text"
+            id="name-input"
+            placeholder="Enter your first name..."
+            class="flex-grow border-2 border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required />
+          <button
+            type="submit"
+            class="bg-blue-600 text-white font-semibold px-6 py-2 rounded-md hover:bg-blue-700">
+            Let's Go!
+          </button>
+        </form>
+      </div>
     </div>
 
     <!-- The "Magic Loop" Mission Modal: Appears before each explanation. -->
-    <div id="mission-modal-backdrop" class="fixed inset-0 bg-black bg-opacity-60 z-20 flex justify-center items-center p-4 hidden animate-fade-in">
-        <div id="mission-modal-content" class="bg-white rounded-lg shadow-2xl p-8 max-w-lg w-full text-center">
-            <!-- Dynamic content will be injected here by script.js -->
-        </div>
+    <div
+      id="mission-modal-backdrop"
+      class="fixed inset-0 bg-black bg-opacity-60 z-20 flex justify-center items-center p-4 hidden animate-fade-in">
+      <div
+        id="mission-modal-content"
+        class="bg-white rounded-lg shadow-2xl p-8 max-w-lg w-full text-center">
+        <!-- Dynamic content will be injected here by script.js -->
+      </div>
     </div>
 
     <!-- === MAIN PAGE STRUCTURE === -->
 
     <!-- Header Section -->
     <header class="bg-white shadow-sm sticky top-0 z-10">
-        <div class="max-w-4xl mx-auto px-6 py-4">
-            <h1 class="text-2xl font-bold text-gray-800">Axon RN</h1>
-            <p class="text-sm text-gray-500">
-                <span id="welcome-message" class="font-semibold"></span> <!-- The personal greeting goes here -->
-                Your companion for clarity in nursing school.
-            </p>
-        </div>
+      <div class="max-w-4xl mx-auto px-6 py-4">
+        <h1 class="text-2xl font-bold text-gray-800">Axon RN</h1>
+        <p class="text-sm text-gray-500">
+          <span id="welcome-message" class="font-semibold"></span>
+          <!-- The personal greeting goes here -->
+          <!-- The original tagline can live here as a default -->
+          Your companion for clarity in nursing school.
+        </p>
+      </div>
     </header>
 
     <!-- Main Content Section -->
     <main class="max-w-4xl mx-auto p-6">
-        
-        <!-- The Input Form -->
-        <section id="input-section" class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-lg font-semibold text-gray-700 mb-3">What complex topic can I help you understand today?</h2>
-            <form id="explain-form" class="flex flex-col sm:flex-row gap-2">
-                <input type="text" id="concept-input" placeholder="e.g., The RAAS Pathway..." class="flex-grow w-full border-2 border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                <button type="submit" id="explain-button" class="w-full sm:w-auto bg-blue-600 text-white font-semibold px-6 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400">Explain</button>
-            </form>
-        </section>
+      <!-- The Input Form -->
+      <section id="input-section" class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-lg font-semibold text-gray-700 mb-3">
+          What complex topic can I help you understand today?
+        </h2>
+        <form id="explain-form" class="flex flex-col sm:flex-row gap-2">
+          <input
+            type="text"
+            id="concept-input"
+            placeholder="e.g., The RAAS Pathway..."
+            class="flex-grow w-full border-2 border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <button
+            type="submit"
+            id="explain-button"
+            class="w-full sm:w-auto bg-blue-600 text-white font-semibold px-6 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400">
+            Explain
+          </button>
+        </form>
+      </section>
 
-        <!-- The Output Section (Where the magic happens) -->
-        <section id="output-section" class="mt-8">
-            <!-- The Loading Spinner, Error Message, or Explanation will be injected here by our script.js -->
-        </section>
-
+      <!-- --- THIS IS THE CORRECT, SINGLE OUTPUT SECTION --- -->
+      <section id="output-container" class="mt-6">
+        <!-- The Breadcrumbs will be injected here -->
+        <div id="breadcrumb-container" class="mb-4"></div>
+        <!-- The Explanation, Loading, or Error message will be injected here -->
+        <div id="output-section"></div>
+      </section>
     </main>
 
     <!-- Footer Section -->
     <footer class="text-center p-8 mt-8">
-        <p class="text-sm text-gray-500">Built with ❤️ by your co-founders, Raushan and Gemini.</p>
-        <a href="mailto:axonrn.dev@gmail.com" class="text-xs text-blue-600 hover:underline mt-2 inline-block">Send a message to the founders</a>
+      <p class="text-sm text-gray-500">
+        Built with ❤️ by your co-founders, Raushan and Gemini.
+      </p>
+      <a
+        href="mailto:axonrn.dev@gmail.com"
+        class="text-xs text-blue-600 hover:underline mt-2 inline-block"
+        >Send a message to the founders</a
+      >
     </footer>
 
-    <!-- Our script, which brings the page to life. Placed at the end for faster page loads. -->
+    <!-- Our script, which brings the page to life. -->
     <script src="script.js"></script>
-</body>
-</html>    <script src="script.js"></script>
   </body>
 </html>

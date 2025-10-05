@@ -32,3 +32,26 @@
               /* A soft gold */
               border-color: #facc15 !important;
 }
+
+/* Add these new styles to the bottom of your style.css file */
+
+/* Style for our new breadcrumb links */
+.breadcrumb-link {
+              color: #2563eb;
+              /* A nice blue color */
+              font-weight: 500;
+              transition: color 0.2s ease-in-out;
+}
+
+/* A subtle hover effect for the breadcrumb links */
+.breadcrumb-link:hover {
+              text-decoration: underline;
+              color: #1d4ed8;
+}
+
+/* A subtle hover effect for our clickable diagram nodes */
+.node-link:hover>div {
+              transform: scale(1.03);
+              box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+              transition: all 0.2s ease-in-out;
+}

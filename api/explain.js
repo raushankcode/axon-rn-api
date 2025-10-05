@@ -20,43 +20,39 @@ module.exports = async (req, res) => {
       return res.status(400).json({ message: "Concept is required." });
     }
     // The Final "Drill-Down" Prompt for api/explain.js
+    // The Final "Complete Magic Loop" Prompt for api/explain.js
 
     const prompt = `
-      ROLE: You are "Axon," a wise and experienced nursing preceptor. Your goal is to build a student's clinical judgment and confidence by creating an interactive learning storyboard.
-      TASK: Generate a complete clinical reasoning storyboard as a single, valid JSON object.
+      ROLE: You are "Axon," an expert nursing educator who creates magical, unforgettable learning experiences.
+      TASK: Generate a complete "Magic Loop" learning module as a single, valid JSON object.
 
       CONCEPT: "${concept}"
 
       JSON STRUCTURE:
-      Output a single, valid JSON object with the exact keys: "title", "analogy", "explanationBullets", and "diagramHtml".
-
-      *** CRITICAL INTERACTIVITY RULE ***
-      Each node <div> in your "diagramHtml" MUST be wrapped in an <a> tag with two specific attributes:
-      1. class="node-link"
-      2. data-concept="..." - The value MUST be a concise, searchable topic for that specific node.
-      Example: <a href="#" class="node-link" data-concept="Pathophysiology of Hypotension"><div class="...">...</div></a>
+      Output a single, valid JSON object with the exact keys: "title", "analogy", "missionQuestion", "highlightNodeId", "explanationBullets", "diagramHtml", and "solidifyQuestion".
 
       RULES FOR "diagramHtml":
-      1.  Tell a "cause and effect" story, showing pathophysiology first, then interventions.
-      2.  Use a clean "Swimlane" layout with generous spacing.
-      3.  Style nodes by type: Problem (red), Action (blue), Clinical Pearl (gold), etc.
-      4.  The entire output must be a single line of HTML text.
+      1.  Create a single, self-contained HTML structure using <div>s and Tailwind CSS. It must be a single line of HTML text.
+      2.  Each node <div> MUST be wrapped in an <a> tag with class="node-link" and a "data-concept" attribute for the drill-down.
+      3.  The node that answers the "missionQuestion" MUST have the CSS class "is-highlighted" on its main <div> tag.
+      4.  You MAY include ONE extra node styled as a "Clinical Pearl" with the class "is-clinical-pearl".
+      5.  Use a "cause and effect" or "Swimlane" layout.
 
-      RULES FOR OTHER KEYS:
-      1. "analogy": Create an analogy that explains the core clinical reasoning.
-      2. "explanationBullets": Write a narrative that explains the visual storyboard, step-by-step.
+      MISSION RULES:
+      1.  "missionQuestion": A clear question that primes the student's mind for the most important learning objective.
+      2.  "highlightNodeId": The HTML 'id' of the node that answers the mission question. This node's <div> MUST also have this 'id'.
+      3.  "explanationBullets": A 1:1 narrative legend for the core steps.
+      4.  "solidifyQuestion": A patient-centered question that challenges the student to apply their new knowledge. Example: "Your patient asks, 'Why do I feel so dizzy?' Based on the map, what simple answer would you give?"
 
-      EXAMPLE for "Nursing Interventions for Sepsis":
+      EXAMPLE OUTPUT (abbreviated):
       {
-        "title": "Clinical Reasoning: Sepsis",
-        "analogy": "Imagine the body as a city under attack. Our mission is to support the defences, reinforce the infrastructure, and restore order.",
-        "explanationBullets": [
-          "Sepsis begins with a systemic attack on the body's own tissues.",
-          "This leads to a crisis of hypotension as blood vessels dilate.",
-          "Our primary action is to reinforce the system with fluids and antibiotics.",
-          "A key piece of wisdom is to always reassess the patient's response."
-        ],
-        "diagramHtml": "<div class='font-sans'><div class='flex justify-center items-start space-x-4'><div class='flex flex-col items-center space-y-2'><a href='#' class='node-link' data-concept='Systemic Inflammatory Response Syndrome'><div class='p-3 border rounded-lg bg-red-50 border-red-200 w-52 text-center'><p class='font-semibold text-red-800'>Problem: Systemic Attack 🔥</p><p class='text-xs'>Body's response to infection damages organs.</p></div></a><p class='text-2xl'>↓</p><a href='#' class='node-link' data-concept='Pathophysiology of Septic Shock'><div class='p-3 border rounded-lg bg-red-50 border-red-200 w-52 text-center'><p class='font-semibold text-red-800'>Crisis: Hypotension 💧</p><p class='text-xs'>Inflammation leads to fluid loss and low BP.</p></div></a></div><div class='flex flex-col items-center space-y-2 mt-24'><a href='#' class='node-link' data-concept='IV Fluid Resuscitation in Sepsis'><div class='p-3 border rounded-lg bg-blue-50 border-blue-200 w-52 text-center'><p class='font-semibold text-blue-800'>Action: Reinforce Infrastructure 🛡️</p><p class='text-xs'>Administer IV fluids and antibiotics promptly.</p></div></a><p class='text-2xl'>↓</p><a href='#' class='node-link' data-concept='Importance of Reassessment in Nursing'><div class='p-3 border rounded-lg bg-yellow-50 border-yellow-300 shadow-lg w-64 text-center'><p class='font-bold text-yellow-800'>💡 Clinical Pearl</p><p class='text-xs mt-1'>Always reassess the patient's response to treatment. Early recognition of changes can save lives!</p></div></a></div></div></div>"
+        "title": "How Beta Blockers Work",
+        "analogy": "They are like soft headphones for the heart.",
+        "missionQuestion": "What specific part of the heart do Beta Blockers block?",
+        "highlightNodeId": "node-2",
+        "explanationBullets": ["..."],
+        "diagramHtml": "<div class='...'><a ... data-concept='Beta Receptors'><div id='node-2' class='... is-highlighted'>...</div></a>...</div>",
+        "solidifyQuestion": "Your patient, who has a high heart rate, asks, 'What is this pill for?' How would you explain it simply?"
       }
     `;
 
